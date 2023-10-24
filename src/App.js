@@ -15,7 +15,16 @@ function App() {
   useEffect(() => {
     async function fetchBooks() {
       try {
-        const fetchBooks = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${inputValue}&key=${apiKey}`).then((response) => response.json()).then((data) => data.items);
+        const fetchBooks = await fetch(
+          `https://www.googleapis.com/books/v1/volumes?q=${inputValue}&key=${apiKey}`,
+        )
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Something went wrong');
+          })
+          .then((data) => data.items);
         setBooks(fetchBooks);
       } catch (e) {
         console.log(e);
