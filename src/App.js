@@ -1,23 +1,35 @@
-import logo from './logo.svg';
 import './App.css';
+import SearchPanel from './components/SearchPanel/SearchPanel';
+import { useEffect, useState } from 'react';
+const apiKey = 'AIzaSyBki-gPmcA9s8U0cJiCNE8Dhetv4H1iKxk';
 
 function App() {
+  const [books, setBooks] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  function handleInput(e) {
+    const {value: targetValue} = e.target;
+    setInputValue(targetValue);
+  }
+
+  useEffect(() => {
+    async function fetchBooks() {
+      try {
+        const fetchBooks = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${inputValue}&key=${apiKey}`).then((response) => response.json()).then((data) => data.items);
+        setBooks(fetchBooks);
+      } catch (e) {
+        console.log(e);
+        setBooks([]);
+      }
+    }
+    fetchBooks();
+  }, [inputValue]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input type="text" value={inputValue} onChange={handleInput} />
+      {books.map(item => (<p key={item.id}>{item.volumeInfo.title}</p>))}
+      {/* <SearchPanel /> */}
     </div>
   );
 }
